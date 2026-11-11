@@ -415,13 +415,13 @@ public class MessageHelper {
             imessage.addHeader("Sensitivity", "Company-Confidential");
 
         // References
-        if (message.references != null)
+        if (!TextUtils.isEmpty(message.references))
             imessage.addHeader("References", limitReferences(message.references));
 
-        if (message.inreplyto != null)
+        if (!TextUtils.isEmpty(message.inreplyto))
             imessage.addHeader("In-Reply-To", message.inreplyto);
 
-        if (message.wasforwardedfrom != null && !forward_new)
+        if (!TextUtils.isEmpty(message.wasforwardedfrom) && !forward_new)
             imessage.addHeader("X-Forwarded-Message-Id", message.wasforwardedfrom);
 
         imessage.addHeader(HEADER_CORRELATION_ID, message.msgid);
@@ -2956,8 +2956,11 @@ public class MessageHelper {
             Address[] from = getAddressHeader("From");
             if (from != null && from.length == 1) {
                 String email = ((InternetAddress) from[0]).getAddress();
-                if (email != null && (email.endsWith(".mozmail.com") || email.endsWith("@mozmail.com")))
+                if (email != null && (email.endsWith(".mozmail.com") || email.endsWith("@mozmail.com"))) {
                     sender = getAddressHeader("Resent-From");
+                    if (sender == null || sender.length == 0)
+                        sender = new Address[]{new InternetAddress("relay@firefox.com")};
+                }
             }
         }
         return sender;
@@ -3413,14 +3416,14 @@ public class MessageHelper {
             if (ip.toLowerCase(Locale.ROOT).startsWith("ipv6:"))
                 ip = ip.substring(5);
             if (ConnectionHelper.isNumericAddress(ip) &&
-                    ConnectionHelper.isLocalAddress(ip, true))
+                    ConnectionHelper.isLocalAddress(null, ip, true))
                 return true;
         }
 
         int f = value.indexOf(' ');
         String host = (f < 0 ? value : value.substring(0, f));
         if (ConnectionHelper.isNumericAddress(host)) {
-            if (ConnectionHelper.isLocalAddress(host, true))
+            if (ConnectionHelper.isLocalAddress(null, host, true))
                 return true;
         }
 
