@@ -320,15 +320,13 @@ public class ServiceSynchronize extends ServiceBase implements SharedPreferences
                     boolean event = false;
                     boolean runFts = true;
                     boolean runService = false;
-                    boolean syncEnabled = PreferenceManager.getDefaultSharedPreferences(ServiceSynchronize.this)
-                            .getBoolean("enabled", true);
                     for (TupleAccountNetworkState current : accountNetworkStates) {
                         Log.d("### evaluating " + current);
                         if (!initialized.contains(current.accountState.id)) {
                             initialized.add(current.accountState.id);
                             init(current);
                         }
-                        if (current.shouldRun() || current.waitsForUnlock(syncEnabled))
+                        if (current.shouldRun())
                             runService = true;
                         if (!current.accountState.isTransient(ServiceSynchronize.this)) {
                             if (current.accountState.isEnabled(current.enabled))
@@ -1569,8 +1567,6 @@ public class ServiceSynchronize extends ServiceBase implements SharedPreferences
         if (lastAccounts > 0)
             builder.setContentTitle(getResources().getQuantityString(
                     R.plurals.title_notification_synchronizing, lastAccounts, lastAccounts));
-        else if (ScreenLock.isPaused(this))
-            builder.setContentTitle(getString(R.string.title_notification_unlock));
         else
             builder.setContentTitle(getString(R.string.title_check_operations));
 
