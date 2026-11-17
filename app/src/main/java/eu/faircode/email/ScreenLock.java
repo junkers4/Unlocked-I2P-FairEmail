@@ -35,7 +35,8 @@ import androidx.preference.PreferenceManager;
 // its notification, quits, so nothing runs in the background while locked. JobUnlock waits for the unlock
 // in the job scheduler and then synchronizes at once, without opening the app.
 public class ScreenLock {
-    static final String PREF = "sync_unlocked";
+    // Renamed so that it is on again for everyone who had switched it off before
+    static final String PREF = "sync_unlocked_v2";
 
     static void init(Context context) {
         Context app = context.getApplicationContext();
