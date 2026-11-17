@@ -32,7 +32,8 @@ import androidx.preference.PreferenceManager;
 
 // Synchronize only while the device is unlocked: locking pauses synchronization like the schedule does,
 // unlocking resumes it at once. On by default: with every account paused the sync service, and with it
-// its notification, quits, so nothing runs in the background while locked.
+// its notification, quits, so nothing runs in the background while locked. JobUnlock waits for the unlock
+// in the job scheduler and then synchronizes at once, without opening the app.
 public class ScreenLock {
     static final String PREF = "sync_unlocked";
 
@@ -79,5 +80,13 @@ public class ScreenLock {
 
         // Like a schedule boundary: disconnects or reconnects, and polls at once after unlocking
         ServiceSynchronize.reschedule(context);
+
+        // Nothing runs while locked; the job scheduler brings the app back for the unlock
+        // (not again on the screen coming on while locked: that would stop the job waiting for the unlock)
+        if (paused) {
+            if (!Intent.ACTION_SCREEN_ON.equals(reason))
+                JobUnlock.schedule(context, 0);
+        } else
+            JobUnlock.cancel(context);
     }
 }

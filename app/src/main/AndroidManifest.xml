@@ -621,6 +621,11 @@
             tools:node="replace" />
 
         <service
+            android:name=".JobUnlock"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <service
             android:name=".ServiceSynchronize"
             android:exported="false"
             android:foregroundServiceType="specialUse">
